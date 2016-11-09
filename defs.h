@@ -1,42 +1,44 @@
 #ifndef _DEFS_H_
 #define _DEFS_H_
 
-#define CONSTSY     1
-#define INTSY       2
-#define CHARSY      3
-#define VOIDSY      4
+#define CHARSY      1
+#define CONSTSY     2
+#define ELSESY      3
+#define DOSY        4
 #define FORSY       5
-#define WHILESY     6
-#define DOSY        7
-#define IFSY        8
-#define ELSESY      9
-#define SCANSY      10
-#define PRTSY       11
-#define INTCON      12
-#define CHARCON     13
-#define STRINGCON   14
-
-#define PLUSSY      15
-#define MINUSSY     16
-#define STARSY      17
-#define DIVSY       18
-#define LCURSY      19
-#define RCURSY      20
-#define LBRKSY      21
-#define RBRKSY      22
-#define LPARSY      23
-#define RPARSY      24
-#define COMMASY     25
-#define SEMISY      26
-#define LTSY        27
-#define LESY        28
-#define GTSY        29
-#define GESY        30
-#define EQSY        31
-#define NESY        32
-
-#define INTTP       33
-#define CHARTP      34
-#define FUNCTP      35
+#define IFSY        6
+#define INTSY       7
+#define PRTSY       8
+#define SCANSY      9
+#define VOIDSY      10
+#define WHILESY     11
+#define IDSY        12
+#define INTCON      13
+#define CHARCON     14
+#define STRCON      15
+#define PLUSSY      16
+#define MINUSSY     17
+#define STARSY      18
+#define DIVSY       19
+#define LCURSY      20
+#define RCURSY      21
+#define LBRKSY      22
+#define RBRKSY      23
+#define LPARSY      24
+#define RPARSY      25
+#define SQSY        26
+#define DQSY        27                    
+#define COMMASY     28
+#define SEMISY      29
+#define ASSIGNSY    30
+#define LTSY        31
+#define LESY        32
+#define GTSY        33
+#define GESY        34
+#define EQSY        35
+#define NESY        36
+#define INTTP       37
+#define CHARTP      38
+#define FUNCTP      39
 
 #endif
