@@ -1,6 +1,7 @@
-/bin
-/obj
-/.vscode
+bin/
+obj/
+.vscode/
+
 *.exe
 *.o
 *.obj
