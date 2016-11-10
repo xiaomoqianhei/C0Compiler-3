@@ -3,91 +3,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <sstream>
 #include <string>
 
 using namespace std;
-
-int symbol;
-string id;
-stringstream ss;
-int inum;
-char ch;
-string curLine;
-int cl, cc, ll;
-
-int syms[256];
-string symbolWords[100];
-int rword; // number of the rwords.
-string rwords[12];
-
-void setup()
-{
-    ch = ' ';
-    syms['+'] = PLUSSY;
-    syms['-'] = MINUSSY;
-    syms['*'] = STARSY;
-    syms['/'] = DIVSY;
-    syms['{'] = LCURSY;
-    syms['}'] = RCURSY;
-    syms['['] = LBRKSY;
-    syms[']'] = RBRKSY;
-    syms['('] = LPARSY;
-    syms[')'] = RPARSY;
-    syms[','] = COMMASY;
-    syms[';'] = SEMISY;
-
-    symbolWords[CHARSY] = "CHARSY";
-    symbolWords[CONSTSY] = "CONSTSY";
-    symbolWords[ELSESY] = "ELSESY";
-    symbolWords[DOSY] = "DOSY";
-    symbolWords[FORSY] = "FORSY";
-    symbolWords[IFSY] = "IFSY";
-    symbolWords[INTSY] = "INTSY";
-    symbolWords[PRTSY] = "PRTSY";
-    symbolWords[SCANSY] = "SCANSY";
-    symbolWords[VOIDSY] = "VOIDSY";
-    symbolWords[WHILESY] = "WHILESY";
-    symbolWords[IDSY] = "IDSY";
-    symbolWords[INTCON] = "INTCON";
-    symbolWords[CHARCON] = "CHARCON";
-    symbolWords[STRCON] = "STRCON";
-    symbolWords[PLUSSY] = "PLUSSY";
-    symbolWords[MINUSSY] = "MINUSSY";
-    symbolWords[STARSY] = "STARSY";
-    symbolWords[DIVSY] = "DIVSY";
-    symbolWords[LCURSY] = "LCURSY";
-    symbolWords[RCURSY] = "RCURSY";
-    symbolWords[LBRKSY] = "LBRKSY";
-    symbolWords[RBRKSY] = "RBRKSY";
-    symbolWords[LPARSY] = "LPARSY";
-    symbolWords[RPARSY] = "RPARSY";
-    symbolWords[COMMASY] = "COMMASY";
-    symbolWords[SEMISY] = "SEMISY";
-    symbolWords[ASSIGNSY] = "ASSIGNSY";
-    symbolWords[LTSY] = "LTSY";
-    symbolWords[LESY] = "LESY";
-    symbolWords[GTSY] = "GTSY";
-    symbolWords[GESY] = "GESY";
-    symbolWords[EQSY] = "EQSY";
-    symbolWords[NESY] = "NESY";
-    symbolWords[INTTP] = "INTTP";
-    symbolWords[CHARTP] = "CHARTP";
-    symbolWords[FUNCTP] = "FUNCTP";
-
-    rword = 11;
-    rwords[1] = "char";
-    rwords[2] = "const";
-    rwords[3] = "else";
-    rwords[4] = "do";
-    rwords[5] = "for";
-    rwords[6] = "if";
-    rwords[7] = "int";
-    rwords[8] = "printf";
-    rwords[9] = "scanf";
-    rwords[10] = "void";
-    rwords[11] = "while";
-}
 
 void error()
 {
@@ -123,7 +41,7 @@ void getSymbol()
         for (getch(); isalpha(ch) || ch == '_' || isdigit(ch); getch())
             id += ch;
         int i;
-        for (i = 1; i <= rword; ++i)
+        for (i = 1; i <= rwordNumber; ++i)
             if (id == rwords[i])
                 break;
         symbol = i;
@@ -134,6 +52,7 @@ void getSymbol()
             id += ch;
         if (id != "0" && id[0] == '0')
             error();
+        stringstream ss;
         ss << id;
         ss >> inum;
     } else if (ch == '<') { // < || <=
