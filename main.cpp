@@ -201,8 +201,10 @@ void getSymbol()
         id = ch;
         symbol = syms[(int)ch];
         getch();
-    } else
+    } else {
         error();
+        getch();
+    }
 }
 
 int main()
