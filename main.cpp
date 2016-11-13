@@ -3,13 +3,134 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <set>
+#include <sstream>
 #include <string>
 
 using namespace std;
 
+// for return value
+int symbol;
+string id;
+int inum;
+// for deal srcfile.
+char ch;
+string curLine;
+int cl, cc, ll;
+// for global words
+int syms[256]; // for character
+const int symbolNumber = 40; // number of the symbolWords
+string symbolWords[symbolNumber];
+const int rwordNumber = 12; // number of the rwords.
+string rwords[rwordNumber];
+// code generate
+int errors;
+int level;
+struct Table {
+    string id; // name
+    int objtp; // type of the entry
+    int val; // value of the entry
+    int adr; // address in a block
+    int params; // the number of the array length or paramList length
+} tab[TABLE_NUM];
+int funcNumber; // the number of the functions
+int functable[TABLE_NUM]; // the index of the functions
+set<int> fsyms; // for skipTo
+// for generate code
+struct Code {
+    string op;
+    string id1;
+    string id2;
+    string res;
+} codes[CODE_NUM];
+int pc;
+
+void setup()
+{
+    // for operator symbols
+    ch = ' ';
+    syms['+'] = PLUSSY;
+    syms['-'] = MINUSSY;
+    syms['*'] = STARSY;
+    syms['/'] = DIVSY;
+    syms['{'] = LCURSY;
+    syms['}'] = RCURSY;
+    syms['['] = LBRKSY;
+    syms[']'] = RBRKSY;
+    syms['('] = LPARSY;
+    syms[')'] = RPARSY;
+    syms[','] = COMMASY;
+    syms[';'] = SEMISY;
+    // for symbol type output
+    symbolWords[CHARSY] = "CHARSY";
+    symbolWords[CONSTSY] = "CONSTSY";
+    symbolWords[ELSESY] = "ELSESY";
+    symbolWords[DOSY] = "DOSY";
+    symbolWords[FORSY] = "FORSY";
+    symbolWords[IFSY] = "IFSY";
+    symbolWords[INTSY] = "INTSY";
+    symbolWords[PRTSY] = "PRTSY";
+    symbolWords[SCANSY] = "SCANSY";
+    symbolWords[VOIDSY] = "VOIDSY";
+    symbolWords[WHILESY] = "WHILESY";
+    symbolWords[IDSY] = "IDSY";
+    symbolWords[INTCON] = "INTCON";
+    symbolWords[CHARCON] = "CHARCON";
+    symbolWords[STRCON] = "STRCON";
+    symbolWords[PLUSSY] = "PLUSSY";
+    symbolWords[MINUSSY] = "MINUSSY";
+    symbolWords[STARSY] = "STARSY";
+    symbolWords[DIVSY] = "DIVSY";
+    symbolWords[LCURSY] = "LCURSY";
+    symbolWords[RCURSY] = "RCURSY";
+    symbolWords[LBRKSY] = "LBRKSY";
+    symbolWords[RBRKSY] = "RBRKSY";
+    symbolWords[LPARSY] = "LPARSY";
+    symbolWords[RPARSY] = "RPARSY";
+    symbolWords[COMMASY] = "COMMASY";
+    symbolWords[SEMISY] = "SEMISY";
+    symbolWords[ASSIGNSY] = "ASSIGNSY";
+    symbolWords[LTSY] = "LTSY";
+    symbolWords[LESY] = "LESY";
+    symbolWords[GTSY] = "GTSY";
+    symbolWords[GESY] = "GESY";
+    symbolWords[EQSY] = "EQSY";
+    symbolWords[NESY] = "NESY";
+    symbolWords[INTTP] = "INTTP";
+    symbolWords[CHARTP] = "CHARTP";
+    symbolWords[FUNCTP] = "FUNCTP";
+    // for reserved words
+    rwords[1] = "char";
+    rwords[2] = "const";
+    rwords[3] = "else";
+    rwords[4] = "do";
+    rwords[5] = "for";
+    rwords[6] = "if";
+    rwords[7] = "int";
+    rwords[8] = "printf";
+    rwords[9] = "scanf";
+    rwords[10] = "void";
+    rwords[11] = "while";
+    // init the code generate
+    errors = 0;
+
+    fsyms.insert("int");
+    fsyms.insert("char");
+    fsyms.insert("void");
+    fsyms.insert("const");
+}
+
 void error()
 {
     cout << "Format Error(" << cl << ',' << cc << "): Unknown Error\n";
+}
+
+void generateError()
+{
+}
+
+void generateCode()
+{
 }
 
 void getNextLine()
@@ -125,14 +246,64 @@ void getSymbol()
         getch();
     }
 }
-
+void skipTo(set<int> valid)
+{
+    set<int>::iterator iter;
+    for (getSymbol(); iter.find(symbol) == iter.end(); getSymbol())
+        ;
+}
+int generateLabel() {}
+int enter() {}
+int findSym() {}
+int paramList() {}
+int expression() {}
+int term() {}
+int factor() {}
+int statement() {}
+int ifStatement() {}
+int loopStatement() {}
+int call() {}
+int paramReal() {}
+int scanfStatement() {}
+int printfStatement() {}
+int returnStatement() {}
+int defConst() {}
+int defVar() {}
+int defFunc() {}
+int defMain() {}
+int program()
+{
+    getSymbol();
+    test(fsyms, fsyms, 0);
+    while (symbol == CONSTSY) {
+        getSymbol();
+        if (defConst(level))
+            skipTo(fsyms);
+    }
+    int isFunc = 0;
+    while (symbol == INTSY || symbol == CHARSY) {
+        int ts = symbol;
+        getSymbol();
+        int is = symbol;
+        string iid = id;
+        getSymbol();
+        if (symbol == LPARSY) {
+            isFunc = 1;
+            enter(iid, ts, ) break;
+        }
+        if (symbol == SEMISY || symbol == COMMASY)
+    }
+}
 int main()
 {
     setup();
-    int word = 0;
-    while (1) {
-        getSymbol();
-        cout << ++word << " : " << symbolWords[symbol] << ' ' << id << "\n";
+    program(0);
+    if (errors == 0) {
+        generateCode();
+        cout << "\nnice!\n";
+    } else {
+        generateError();
+        cout << "\nOoops\n";
     }
     return 0;
 }

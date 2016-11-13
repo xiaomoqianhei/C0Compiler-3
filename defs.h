@@ -16,6 +16,7 @@
 #define INTCON 13
 #define CHARCON 14
 #define STRCON 15
+
 #define PLUSSY 16
 #define MINUSSY 17
 #define STARSY 18
@@ -37,95 +38,37 @@
 #define GESY 34
 #define EQSY 35
 #define NESY 36
+
+#define CONSTOBJ 37
+#define VAROBJ 38
+#define ARRAYOBJ 37
+#define FUNCOBJ 37
+
 #define INTTP 37
 #define CHARTP 38
 #define FUNCTP 39
-
-#include <string>
-#include <sstream>
-using namespace std;
-
-// for return value
-int symbol;
-string id;
-int inum;
-// for deal srcfile.
-char ch;
-string curLine;
-int cl, cc, ll;
-// for global words
-int syms[256]; // for character 
-const int symbolNumber = 40; // number of the symbolWords
-string symbolWords[symbolNumber];
-const int rwordNumber = 12; // number of the rwords.
-string rwords[rwordNumber];
-
-void setup()
-{
-    // for operator symbols
-    ch = ' ';
-    syms['+'] = PLUSSY;
-    syms['-'] = MINUSSY;
-    syms['*'] = STARSY;
-    syms['/'] = DIVSY;
-    syms['{'] = LCURSY;
-    syms['}'] = RCURSY;
-    syms['['] = LBRKSY;
-    syms[']'] = RBRKSY;
-    syms['('] = LPARSY;
-    syms[')'] = RPARSY;
-    syms[','] = COMMASY;
-    syms[';'] = SEMISY;
-    // for symbol type output
-    symbolWords[CHARSY] = "CHARSY";
-    symbolWords[CONSTSY] = "CONSTSY";
-    symbolWords[ELSESY] = "ELSESY";
-    symbolWords[DOSY] = "DOSY";
-    symbolWords[FORSY] = "FORSY";
-    symbolWords[IFSY] = "IFSY";
-    symbolWords[INTSY] = "INTSY";
-    symbolWords[PRTSY] = "PRTSY";
-    symbolWords[SCANSY] = "SCANSY";
-    symbolWords[VOIDSY] = "VOIDSY";
-    symbolWords[WHILESY] = "WHILESY";
-    symbolWords[IDSY] = "IDSY";
-    symbolWords[INTCON] = "INTCON";
-    symbolWords[CHARCON] = "CHARCON";
-    symbolWords[STRCON] = "STRCON";
-    symbolWords[PLUSSY] = "PLUSSY";
-    symbolWords[MINUSSY] = "MINUSSY";
-    symbolWords[STARSY] = "STARSY";
-    symbolWords[DIVSY] = "DIVSY";
-    symbolWords[LCURSY] = "LCURSY";
-    symbolWords[RCURSY] = "RCURSY";
-    symbolWords[LBRKSY] = "LBRKSY";
-    symbolWords[RBRKSY] = "RBRKSY";
-    symbolWords[LPARSY] = "LPARSY";
-    symbolWords[RPARSY] = "RPARSY";
-    symbolWords[COMMASY] = "COMMASY";
-    symbolWords[SEMISY] = "SEMISY";
-    symbolWords[ASSIGNSY] = "ASSIGNSY";
-    symbolWords[LTSY] = "LTSY";
-    symbolWords[LESY] = "LESY";
-    symbolWords[GTSY] = "GTSY";
-    symbolWords[GESY] = "GESY";
-    symbolWords[EQSY] = "EQSY";
-    symbolWords[NESY] = "NESY";
-    symbolWords[INTTP] = "INTTP";
-    symbolWords[CHARTP] = "CHARTP";
-    symbolWords[FUNCTP] = "FUNCTP";
-    // for reserved words
-    rwords[1] = "char";
-    rwords[2] = "const";
-    rwords[3] = "else";
-    rwords[4] = "do";
-    rwords[5] = "for";
-    rwords[6] = "if";
-    rwords[7] = "int";
-    rwords[8] = "printf";
-    rwords[9] = "scanf";
-    rwords[10] = "void";
-    rwords[11] = "while";
-}
+#define ARRAYTP 40
+// for code generate
+#define TABLE_NUM 32768
+#define CODE_NUM 32768
+// error code
+#define E_NOFILE 1
+#define E_INCOMPLETE 2
+#define E_INVALIDCHAR 3
+#define E_INVALIDEXP 4
+#define E_DEFINEERROR 5
+#define E_UNDEFINE 6
+#define E_REDEFINE 7
+#define E_CONVERTION 8
+#define E_NOTWRITABLE 9
+#define E_MISSSEMI 10
+#define E_MISSCOMMA 11
+#define E_MISSLPAR 12
+#define E_MISSRPAR 13
+#define E_MISSLBRK 14
+#define E_MISSRBRK 15
+#define E_MISSLCUR 16
+#define E_MISSRCUR 17
+#define E_NORETURN 18
 
 #endif
