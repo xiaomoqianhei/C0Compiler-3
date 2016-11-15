@@ -3,4 +3,4 @@ SRC=$(wildcard *.cpp)
 HEADERS=$(wildcard *.h)
 
 a: $(HEADERS) $(SRC)
-	g++ -o $@ $^ $(CFLAGS)
+	g++ -std=c++11 -o $@ $^ $(CFLAGS)

@@ -1,6 +1,7 @@
 #ifndef _DEFS_H_
 #define _DEFS_H_
 
+#define NOTP 0
 #define CHARSY 1
 #define CONSTSY 2
 #define ELSESY 3
@@ -70,5 +71,5 @@
 #define E_MISSLCUR 16
 #define E_MISSRCUR 17
 #define E_NORETURN 18
-
+#define E_INVALIDTYPE 19
 #endif

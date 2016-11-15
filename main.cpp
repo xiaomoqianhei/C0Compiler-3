@@ -10,7 +10,7 @@
 using namespace std;
 
 // for return value
-int symbol;
+int Symbol;
 string id;
 int inum;
 // for deal srcfile.
@@ -21,8 +21,8 @@ int cl, cc, ll;
 int syms[256]; // for character
 const int symbolNumber = 40; // number of the symbolWords
 string symbolWords[symbolNumber];
-const int rwordNumber = 12; // number of the rwords.
-string rwords[rwordNumber];
+const int rwordNumber = 11; // number of the rwords.
+string rwords[rwordNumber + 1];
 // code generate
 int errors;
 int level;
@@ -114,15 +114,20 @@ void setup()
     // init the code generate
     errors = 0;
 
-    fsyms.insert("int");
-    fsyms.insert("char");
-    fsyms.insert("void");
-    fsyms.insert("const");
+    fsyms.insert(INTSY);
+    fsyms.insert(CHARSY);
+    fsyms.insert(VOIDSY);
+    fsyms.insert(CONSTSY);
 }
 
 void error()
 {
     cout << "Format Error(" << cl << ',' << cc << "): Unknown Error\n";
+}
+
+void showMsg(string kind, string type, string name, int value)
+{
+    cout << kind << " " << type << " " << name << " " << value << endl;
 }
 
 void generateError()
@@ -165,9 +170,9 @@ void getSymbol()
         for (i = 1; i <= rwordNumber; ++i)
             if (id == rwords[i])
                 break;
-        symbol = i;
+        Symbol = i;
     } else if (isdigit(ch)) { // number
-        symbol = INTCON;
+        Symbol = INTCON;
         id = ch;
         for (getch(); isdigit(ch); getch())
             id += ch;
@@ -181,22 +186,22 @@ void getSymbol()
         getch();
         if (ch == '=') {
             id += ch;
-            symbol = LESY;
+            Symbol = LESY;
             getch();
         } else
-            symbol = LTSY;
+            Symbol = LTSY;
     } else if (ch == '>') { // > || >=
         id = ch;
         getch();
         if (ch == '=') {
             id += ch;
-            symbol = GESY;
+            Symbol = GESY;
             getch();
         } else
-            symbol = GTSY;
+            Symbol = GTSY;
     } else if (ch == '!') { // !=
         id = ch;
-        symbol = NESY;
+        Symbol = NESY;
         getch();
         if (ch == '=') {
             id += ch;
@@ -208,15 +213,16 @@ void getSymbol()
         getch();
         if (ch == '=') {
             id += ch;
-            symbol = ASSIGNSY;
+            Symbol = EQSY;
             getch();
         } else
-            symbol = EQSY;
+            Symbol = ASSIGNSY;
     } else if (ch == '\'') { // char const
-        symbol = CHARCON;
+        Symbol = CHARCON;
         getch();
         if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '_' || isalnum(ch)) {
             id = ch;
+            inum = (int)ch;
             getch();
             if (ch != '\'')
                 error();
@@ -225,7 +231,7 @@ void getSymbol()
         } else
             error();
     } else if (ch == '\"') { // string const
-        symbol = STRCON;
+        Symbol = STRCON;
         id = "";
         for (getch(); ch != '\"'; getch())
             if (32 <= ch && ch <= 126)
@@ -239,7 +245,7 @@ void getSymbol()
             getch();
     } else if (strchr("+-*/()[]{},;", ch)) { // other operators
         id = ch;
-        symbol = syms[(int)ch];
+        Symbol = syms[(int)ch];
         getch();
     } else {
         error();
@@ -248,9 +254,18 @@ void getSymbol()
 }
 void skipTo(set<int> valid)
 {
-    set<int>::iterator iter;
-    for (getSymbol(); iter.find(symbol) == iter.end(); getSymbol())
+    for (getSymbol(); valid.find(Symbol) == valid.end(); getSymbol())
         ;
+}
+void test(set<int> valid, int errornum)
+{
+    if (valid.find(Symbol) == valid.end()) {
+        error();
+        cout << "from test" << endl;
+        getSymbol();
+        while (valid.find(Symbol) == valid.end())
+            getSymbol();
+    }
 }
 int generateLabel() {}
 int enter() {}
@@ -267,32 +282,78 @@ int paramReal() {}
 int scanfStatement() {}
 int printfStatement() {}
 int returnStatement() {}
-int defConst() {}
-int defVar() {}
-int defFunc() {}
-int defMain() {}
-int program()
+int defConst(int level)
 {
     getSymbol();
-    test(fsyms, fsyms, 0);
-    while (symbol == CONSTSY) {
+    int tp = Symbol == INTSY ? INTTP : Symbol == CHARSY ? CHARTP : NOTP;
+    if (tp == NOTP) {
+        error(E_DEFINEERROR);
+        return 1;
+    }
+    getSymbol();
+    if (Symbol != IDSY) {
+        error(E_DEFINEERROR);
+        return 1;
+    }
+    for (; Symbol == IDSY; getSymbol()) {
+        string name = id;
         getSymbol();
+        if (Symbol == ASSIGNSY) {
+            getSymbol();
+            if ((tp == INTTP && Symbol == INTCON) || (tp == CHARTP && Symbol == CHARCON)) {
+                int value = inum;
+                showMsg("define const", symbolWords[tp], name, value);
+                getSymbol();
+                if (Symbol == SEMISY) {
+                    getSymbol();
+                    return 0;
+                } else if (Symbol == COMMASY)
+                    continue;
+                else {
+                    error(E_MISSSEMI);
+                    return 1;
+                }
+            } else {
+                error(E_INVALIDTYPE);
+                return 1;
+            }
+        } else {
+            error(E_DEFINEERROR);
+            return 1;
+        }
+    }
+    return 0;
+}
+int defVar(int level, int back)
+{
+}
+int defFunc(int level, int back) {}
+int defMain(int level) {}
+int program(int level)
+{
+    getSymbol();
+    test(fsyms, 0);
+    while (Symbol == CONSTSY) {
         if (defConst(level))
             skipTo(fsyms);
     }
-    int isFunc = 0;
-    while (symbol == INTSY || symbol == CHARSY) {
-        int ts = symbol;
-        getSymbol();
-        int is = symbol;
-        string iid = id;
-        getSymbol();
-        if (symbol == LPARSY) {
-            isFunc = 1;
-            enter(iid, ts, ) break;
-        }
-        if (symbol == SEMISY || symbol == COMMASY)
+    test(fsyms, 0);
+    while (Symbol == INTSY || Symbol == CHARSY) {
+        if (defVar(level, 1))
+            break;
     }
+    test(fsyms, 0);
+    while (Symbol == INTSY || Symbol == CHARSY || Symbol == VOIDSY) {
+        if (defFunc(level, 1))
+            break;
+    }
+    test(fsyms, 0);
+    if (Symbol == VOIDSY) {
+        if (defMain(level) == 0)
+            cout << "pofei!\n";
+    } else
+        error();
+    return 0;
 }
 int main()
 {
