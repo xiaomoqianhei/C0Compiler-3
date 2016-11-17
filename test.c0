@@ -1,2 +1,33 @@
 const int a = 3,b=4;
 const int c=1,k = 3;
+int d,e;
+int f;
+
+int vs(int a,int b){
+    int v,c;
+    v=3;
+    if(v==3){
+        c=1;
+    }else{
+        c=2+c*c+2;
+    }
+    for(v=3;v<=3;v=v+1){
+        c=v;
+    }
+    scanf();
+
+}
+
+void new(){
+    const int bbb =1;
+    const char s ='c';
+    char k;
+    do{
+        k=k+1;
+    }while(k<'z')
+    ;
+}
+
+void main(){
+
+}

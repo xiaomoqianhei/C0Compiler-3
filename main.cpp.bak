@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <queue>
 #include <set>
 #include <sstream>
 #include <string>
@@ -13,6 +14,10 @@ using namespace std;
 int Symbol;
 string id;
 int inum;
+queue<int> bsymbol;
+queue<string> bid;
+queue<int> binum;
+int fromBackup;
 // for deal srcfile.
 char ch;
 string curLine;
@@ -35,7 +40,8 @@ struct Table {
 } tab[TABLE_NUM];
 int funcNumber; // the number of the functions
 int functable[TABLE_NUM]; // the index of the functions
-set<int> fsyms; // for skipTo
+set<int> gfsyms; // for skipTo
+set<int> ffsyms;
 // for generate code
 struct Code {
     string op;
@@ -113,23 +119,51 @@ void setup()
     rwords[11] = "while";
     // init the code generate
     errors = 0;
-
-    fsyms.insert(INTSY);
-    fsyms.insert(CHARSY);
-    fsyms.insert(VOIDSY);
-    fsyms.insert(CONSTSY);
+    // in global
+    gfsyms.insert(INTSY);
+    gfsyms.insert(CHARSY);
+    gfsyms.insert(VOIDSY);
+    gfsyms.insert(CONSTSY);
+    // in functions
+    ffsyms.insert(CONSTSY);
+    ffsyms.insert(INTSY);
+    ffsyms.insert(CHARSY);
+    ffsyms.insert(IDSY);
+    ffsyms.insert(FORSY);
+    ffsyms.insert(IFSY);
+    ffsyms.insert(DOSY);
+    ffsyms.insert(WHILESY);
+    ffsyms.insert();
+    ffsyms.insert();
 }
 
 void error()
 {
     cout << "Format Error(" << cl << ',' << cc << "): Unknown Error\n";
 }
-
-void showMsg(string kind, string type, string name, int value)
+void error(int errornum)
 {
-    cout << kind << " " << type << " " << name << " " << value << endl;
+    cout << "Format Error(" << cl << ',' << cc << "): " << errornum << " Error.\n";
 }
 
+void showMsg(string des, string type, string name, int value)
+{
+    cout << des << " " << type << " " << name << " " << value << endl;
+}
+void backupSymbol(int flag)
+{
+    if (!flag)
+        return;
+    bsymbol.push(Symbol);
+    bid.push(id);
+    binum.push(inum);
+}
+void clearBackup()
+{
+    bsymbol = queue<int>();
+    bid = queue<string>();
+    binum = queue<int>();
+}
 void generateError()
 {
 }
@@ -160,6 +194,15 @@ void getch()
 
 void getSymbol()
 {
+    if (fromBackup && !bsymbol.empty()) {
+        Symbol = bsymbol.front();
+        id = bid.front();
+        inum = binum.front();
+        bsymbol.pop();
+        bid.pop();
+        binum.pop();
+        return;
+    }
     while (ch == ' ' || ch == '\n' || ch == '\t')
         getch();
     if (isalpha(ch) || ch == '_') { // alpha
@@ -288,37 +331,40 @@ int defConst(int level)
     int tp = Symbol == INTSY ? INTTP : Symbol == CHARSY ? CHARTP : NOTP;
     if (tp == NOTP) {
         error(E_DEFINEERROR);
+        skipTo(gfsyms, 0);
         return 1;
     }
-    getSymbol();
-    if (Symbol != IDSY) {
-        error(E_DEFINEERROR);
-        return 1;
-    }
-    for (; Symbol == IDSY; getSymbol()) {
+    while (1) {
+        getSymbol();
+        if (Symbol != IDSY) {
+            error(E_DEFINEERROR);
+            skipTo(gfsyms, 0);
+            return 1;
+        }
         string name = id;
         getSymbol();
-        if (Symbol == ASSIGNSY) {
-            getSymbol();
-            if ((tp == INTTP && Symbol == INTCON) || (tp == CHARTP && Symbol == CHARCON)) {
-                int value = inum;
-                showMsg("define const", symbolWords[tp], name, value);
-                getSymbol();
-                if (Symbol == SEMISY) {
-                    getSymbol();
-                    return 0;
-                } else if (Symbol == COMMASY)
-                    continue;
-                else {
-                    error(E_MISSSEMI);
-                    return 1;
-                }
-            } else {
-                error(E_INVALIDTYPE);
-                return 1;
-            }
-        } else {
+        if (Symbol != ASSIGNSY) {
             error(E_DEFINEERROR);
+            skipTo(gfsyms);
+            return 1;
+        }
+        getSymbol();
+        if ((tp == INTTP && Symbol != INTCON) || (tp == CHARTP && Symbol != CHARCON)) {
+            error(E_INVALIDTYPE);
+            skipTo(gfsyms);
+            return 1;
+        }
+        int value = inum;
+        showMsg("define const", symbolWords[tp], name, value);
+        getSymbol();
+        if (Symbol == COMMASY)
+            continue;
+        else if (Symbol == SEMISY) {
+            getSymbol();
+            return 0;
+        } else {
+            error(E_MISSSEMI);
+            skipTo(gfsyms);
             return 1;
         }
     }
@@ -326,28 +372,58 @@ int defConst(int level)
 }
 int defVar(int level, int back)
 {
+    clearBackup();
+    backupSymbol(back);
+    int tp = Symbol == INTSY ? INTTP : Symbol == CHARSY ? CHARTP : NOTP;
+    if (tp == NOTP)
+        return 1;
+
+    while (1) {
+        getSymbol();
+        backupSymbol(back);
+        if (Symbol != IDSY) {
+            error(E_DEFINEERROR);
+            return 1;
+        }
+        showMsg("define var", symbolWords[tp], id, 0);
+        getSymbol();
+        backupSymbol(back);
+        if (Symbol == LBRKSY) {
+            getSymbol();
+        }
+        if (Symbol == COMMASY)
+            continue;
+        else if (Symbol == SEMISY) {
+            getSymbol();
+            return 0;
+        } else {
+            error(E_MISSSEMI);
+            return 1;
+        }
+    }
+    return 0;
 }
 int defFunc(int level, int back) {}
 int defMain(int level) {}
 int program(int level)
 {
     getSymbol();
-    test(fsyms, 0);
+    test(gfsyms, 0);
     while (Symbol == CONSTSY) {
         if (defConst(level))
-            skipTo(fsyms);
+            skipTo(gfsyms);
     }
-    test(fsyms, 0);
+    test(gfsyms, 0);
     while (Symbol == INTSY || Symbol == CHARSY) {
         if (defVar(level, 1))
             break;
     }
-    test(fsyms, 0);
+    test(gfsyms, 0);
     while (Symbol == INTSY || Symbol == CHARSY || Symbol == VOIDSY) {
         if (defFunc(level, 1))
             break;
     }
-    test(fsyms, 0);
+    test(gfsyms, 0);
     if (Symbol == VOIDSY) {
         if (defMain(level) == 0)
             cout << "pofei!\n";
