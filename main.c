@@ -198,8 +198,8 @@ void next()
                 // starts with number 0
                 while (*src >= '0' && *src <= '9')
                     token_val = token_val * 10 + *src++ - '0';
-                if (token_val == 0)
-                    error(0);
+                if (token_val != 0)
+                    error(100);
             }
             token = Num;
             return;
@@ -350,7 +350,11 @@ void term()
 
 void expression()
 {
-    if (token == '+')
+    if (token == '"') {
+        match('"');
+        showMsg("string");
+        return;
+    } else if (token == '+')
         match('+');
     else if (token == '-')
         match('-');
@@ -613,7 +617,7 @@ void function_body()
         // local variable declaration, just like global ones.
         basetype = (token == Int) ? INT : CHAR;
         match(token);
-       
+
         while (token != ';') {
             type = basetype;
             if (token != Id)
@@ -631,7 +635,6 @@ void function_body()
             current_id[Value] = ++pos_local; // index of current parameter
             if (token == ',')
                 match(',');
-             
         }
         match(';');
         showMsg("int or char");
@@ -761,7 +764,6 @@ void global_declaration(int* declaration_index)
             current_id[Class] = Fun;
             current_id[Value] = (int)(text + 1); // the memory address of function
             function_declaration();
-
         } else {
             // variable declaration
             if (*declaration_index != 1)
@@ -811,7 +813,7 @@ int main(int argc, char** argv)
     }
 
     poolsize = 256 * 1024; // arbitrary size
-    line = 0;
+    line = 1;
 
     // allocate memory
     if (!(text = malloc(poolsize))) {
